@@ -50,7 +50,10 @@
 
 /* USER CODE BEGIN PV */
 
-volatile int cntX;
+volatile int cntX = 0;
+volatile int cntX1 = 0;
+volatile int tickX = 0;
+volatile state_t state = IDLE;
 
 /* USER CODE END PV */
 

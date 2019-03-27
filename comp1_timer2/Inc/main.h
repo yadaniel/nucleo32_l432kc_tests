@@ -75,6 +75,10 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 
 extern volatile int cntX;
+extern volatile int cntX1;
+extern volatile int tickX;
+typedef enum state {IDLE, COUNTING, DONE} state_t;
+extern volatile state_t state;
 
 /* USER CODE END Private defines */
 

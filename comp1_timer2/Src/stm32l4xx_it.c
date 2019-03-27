@@ -168,8 +168,36 @@ void SysTick_Handler(void) {
   */
 void TIM2_IRQHandler(void) {
     /* USER CODE BEGIN TIM2_IRQn 0 */
+
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
+
+    tickX += 1;
+    switch(state) {
+    case IDLE:
+        if(cntX != cntX1) {
+            state = COUNTING;
+            cntX = cntX1 = 0;
+            tickX = 0;
+        }
+        break;
+    case COUNTING:
+        /* if((tickX > 10) && (cntX == cntX1)) { */
+        if(cntX == cntX1) {
+            state = DONE;
+            tickX = 0;
+        }
+        break;
+    case DONE:
+        if(tickX > 100) {
+            state = IDLE;
+            tickX = 0;
+        }
+        break;
+    }
+    cntX1 = cntX;
+
     /* USER CODE END TIM2_IRQn 0 */
+
     HAL_TIM_IRQHandler(&htim2);
     /* USER CODE BEGIN TIM2_IRQn 1 */
 

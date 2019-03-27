@@ -133,13 +133,19 @@ void StartTask02(void const * argument) {
     /* USER CODE BEGIN StartTask02 */
     /* Infinite loop */
     char buffer[16];
-    int cnt = 0;
     /* HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET); */
     /* HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET); */
     HAL_COMP_Start(&hcomp1);
+    HAL_TIM_Base_Start_IT(&htim2);
     for(;;) {
-        cnt += 1;
-        snprintf(buffer, sizeof(buffer), "%4i\n", cntX);
+        if(state == DONE) {
+            float temp = (float)cntX;
+            temp -= 808;
+            temp *= 0.0625f;
+            snprintf(buffer, sizeof(buffer), "%4i=>%i\n", cntX, (int)temp);
+        } else {
+            /* snprintf(buffer, sizeof(buffer), "----\n"); */
+        }
         HAL_UART_Transmit(&huart2, (uint8_t*)&buffer[0], strlen(buffer), 10);
         /* HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3); */
         HAL_Delay(100);
