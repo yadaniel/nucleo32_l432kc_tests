@@ -54,7 +54,9 @@ def selectCOM():
 
 parser = argparse.ArgumentParser(description='Temperature logger')
 parser.add_argument("--com", help="com port")
-parser.add_argument("--duration", type=int, help="duration in seconds")
+parser.add_argument("--duration", type=int, help="duration in seconds [60 default]")
+parser.add_argument("--low", type=int, help="temperature scale low [15 default]")
+parser.add_argument("--high", type=int, help="temperature scale high [30 default]")
 args = parser.parse_args()
 
 port = args.com
@@ -64,6 +66,14 @@ if args.com is None:
 duration = args.duration
 if args.duration is None:
     duration = 60
+
+tempLow = args.low
+if args.low is None:
+    tempLow = 15
+
+tempHigh = args.high
+if args.high is None:
+    tempHigh = 30
 
 # com port settings
 comSettings = {
@@ -110,7 +120,7 @@ plt.clf()
 plt.rcParams.update({'legend.fontsize':4, 'font.size':4})
 plt.grid(True)
 plt.plot(tsamp,temps,'r')
-plt.ylim([min(min(temps)-5, 0), max(max(temps)+5, 30)])
+plt.ylim([min(min(temps)-5, tempLow), max(max(temps)+5, tempHigh)])
 plt.title("temperature")
 plt.legend(['degC'], loc='upper right')
 
