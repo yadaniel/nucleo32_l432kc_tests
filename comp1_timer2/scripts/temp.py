@@ -3,8 +3,7 @@
 import pylab as plt
 import datetime as dt
 import re, sys, time, serial, atexit
-import os, platform
-import argparse
+import argparse, math, os, platform
 
 def pollCOM():
     comListTry = []
@@ -57,6 +56,7 @@ parser.add_argument("--com", help="com port")
 parser.add_argument("--duration", type=int, help="duration in seconds [60 default]")
 parser.add_argument("--low", type=int, help="temperature scale low [15 default]")
 parser.add_argument("--high", type=int, help="temperature scale high [30 default]")
+parser.add_argument("--sample", type=int, help="seconds between samples [all default]")
 args = parser.parse_args()
 
 port = args.com
@@ -74,6 +74,10 @@ if args.low is None:
 tempHigh = args.high
 if args.high is None:
     tempHigh = 30
+
+sampleTime = args.sample
+if args.sample is None:
+    sampleTime = 0
 
 # com port settings
 comSettings = {
@@ -98,6 +102,7 @@ tsamp = []
 temps = []
 # pattern = re.compile(r".*?=>(?P<tempC>\d+)\n")
 pattern = re.compile(r".*?=>(?P<tempC>\d+\.\d+)\n")
+lastSampleTime = math.floor(time.time())
 while dt.datetime.now() < stopAt:
     try:
         line = com.read(20) # usually 12 chars
@@ -108,8 +113,14 @@ while dt.datetime.now() < stopAt:
             continue
         sys.stdout.write("%s: %s°C\n" % (dt.datetime.now(), temp))
         sys.stdout.flush()
-        tsamp.append(time.time())
-        temps.append(float(temp))
+        # filter for logging
+        currentSampleTime = math.floor(time.time())
+        if abs(currentSampleTime - lastSampleTime) >= sampleTime:
+            sys.stdout.write(">>> %s: %s°C\n" % (dt.datetime.now(), temp))
+            sys.stdout.flush()
+            lastSampleTime = currentSampleTime
+            tsamp.append(time.time())
+            temps.append(float(temp))
     except Exception as e:
         sys.stdout.write("%s" % e)
         sys.stdout.flush()
@@ -120,7 +131,7 @@ plt.clf()
 plt.rcParams.update({'legend.fontsize':4, 'font.size':4})
 plt.grid(True)
 plt.plot(tsamp,temps,'r')
-plt.ylim([min(min(temps)-5, tempLow), max(max(temps)+5, tempHigh)])
+plt.ylim([min(min(temps)-1, tempLow), max(max(temps)+1, tempHigh)])
 plt.title("temperature")
 plt.legend(['degC'], loc='upper right')
 
