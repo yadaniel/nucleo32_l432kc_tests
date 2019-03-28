@@ -31,6 +31,7 @@
 #include <usart.h>
 #include <comp.h>
 #include <tim.h>
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -133,6 +134,7 @@ void StartTask02(void const * argument) {
     /* USER CODE BEGIN StartTask02 */
     /* Infinite loop */
     char buffer[16];
+    float tempFull, tempComma;
     /* HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET); */
     /* HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET); */
     HAL_COMP_Start(&hcomp1);
@@ -142,7 +144,11 @@ void StartTask02(void const * argument) {
             float temp = (float)cntX;
             temp -= 808;
             temp *= 0.0625f;
-            snprintf(buffer, sizeof(buffer), "%4i=>%i\n", cntX, (int)temp);
+            /* snprintf(buffer, sizeof(buffer), "%4i=>%i\n", cntX, (int)temp); */
+            /* snprintf(buffer, sizeof(buffer), "%4i=>%.2f\n", cntX, temp); */
+            tempFull = floor(temp);
+            tempComma = (temp - tempFull)*100;
+            snprintf(buffer, sizeof(buffer), "%4i=>%i.%02i\n", cntX, (int)tempFull, (int)tempComma);
         } else {
             /* snprintf(buffer, sizeof(buffer), "----\n"); */
         }

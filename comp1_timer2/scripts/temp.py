@@ -71,13 +71,14 @@ except Exception as exc:
     print(exc)
     sys.exit()
 
-stopAt = dt.datetime.now() + dt.timedelta(seconds = 3600)
+stopAt = dt.datetime.now() + dt.timedelta(seconds = 600)
 tsamp = []
 temps = []
-pattern = re.compile(r".*?=>(?P<tempC>\d+)\n")
+# pattern = re.compile(r".*?=>(?P<tempC>\d+)\n")
+pattern = re.compile(r".*?=>(?P<tempC>\d+\.\d+)\n")
 while dt.datetime.now() < stopAt:
     try:
-        line = com.read(10)
+        line = com.read(20) # usually 12 chars
         m = pattern.match(line.decode("ascii"))
         if m:
             temp = m.group("tempC")
