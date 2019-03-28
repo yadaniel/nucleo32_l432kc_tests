@@ -24,12 +24,13 @@ def pollCOM():
             com = serial.Serial(comTry)
             comListFound.append(comTry)
             sys.stdout.write("yes\n")
+            sys.stdout.flush()
             com.close()
         except KeyboardInterrupt:
             sys.exit()
         except:
             sys.stdout.write("no\n")
-            pass
+            time.sleep(0.1)
     sys.stdout.write("%r\n" % comListFound)
     sys.stdout.flush()
     return comListFound
@@ -40,8 +41,6 @@ def selectCOM():
         sys.stdout.write("no com port\n")
         sys.stdout.flush()
         sys.exit(0)
-    elif len(comListFound) == 1:
-        port = comListFound[0]
     else:
         sys.stdout.write("%r\n" % comListFound)
         sys.stdout.flush()
