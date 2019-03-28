@@ -4,6 +4,7 @@ import pylab as plt
 import datetime as dt
 import re, sys, time, serial, atexit
 import os, platform
+import argparse
 
 def pollCOM():
     comListTry = []
@@ -50,8 +51,19 @@ def selectCOM():
             if port in comListFound:
                 return port
 
-port = selectCOM()
-time.sleep(0.1)
+
+parser = argparse.ArgumentParser(description='Temperature logger')
+parser.add_argument("--com", help="com port")
+parser.add_argument("--duration", type=int, help="duration in seconds")
+args = parser.parse_args()
+
+port = args.com
+if args.com is None:
+    port = selectCOM()
+
+duration = args.duration
+if args.duration is None:
+    duration = 60
 
 # com port settings
 comSettings = {
@@ -71,7 +83,7 @@ except Exception as exc:
     print(exc)
     sys.exit()
 
-stopAt = dt.datetime.now() + dt.timedelta(seconds = 600)
+stopAt = dt.datetime.now() + dt.timedelta(seconds = duration)
 tsamp = []
 temps = []
 # pattern = re.compile(r".*?=>(?P<tempC>\d+)\n")
