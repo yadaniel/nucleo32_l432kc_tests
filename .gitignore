@@ -6,5 +6,5 @@
 **.hex
 **.elf
 **/tags
-**/.c.orig
+**.c.orig
 
