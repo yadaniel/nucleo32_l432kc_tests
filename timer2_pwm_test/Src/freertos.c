@@ -29,6 +29,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "usart.h"
+#include "tim.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -142,15 +143,38 @@ void StartDefaultTask(void const * argument) {
 /* USER CODE END Header_StartTask02 */
 void StartTask02(void const * argument) {
     /* USER CODE BEGIN StartTask02 */
-    /* Infinite loop */
+    TIM_OC_InitTypeDef sConfigOC = {0};
+    HAL_TIM_Base_Start_IT(&htim2);
+    /* HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_ALL); */
+    HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
     uint32_t cnt = 0;
+    int duty_cycle = 0;     // 1000 is 100%
     char buffer[16];
     for(;;) {
         cnt += 1;
         snprintf(&buffer[0], sizeof(buffer), "cnt=%li\n", cnt);
         HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 10);
-        osDelay(100);
-        HAL_Delay(100);
+        osDelay(10);
+        HAL_Delay(10);
+        if(cnt % 10 == 0) {
+            duty_cycle += 10;
+            if(duty_cycle >= 1000) {
+                duty_cycle = 0;
+            }
+            sConfigOC.OCMode = TIM_OCMODE_PWM1;
+            sConfigOC.Pulse = duty_cycle;
+            sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+            sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+            if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK) {
+                Error_Handler();
+            }
+            if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK) {
+                Error_Handler();
+            }
+            HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_1);
+            HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
+        }
     }
     /* USER CODE END StartTask02 */
 }
