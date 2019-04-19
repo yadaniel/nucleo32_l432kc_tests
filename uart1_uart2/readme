@@ -1,0 +1,5 @@
+STM32L432KCUx_FLASH.ld was zero and make generated empty bin
+
+$ arm-none-eabi-size build/uart1_uart2.elf
+   text    data     bss     dec     hex filename
+      8       0       0       8       8 build/uart1_uart2.elf
